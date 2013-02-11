@@ -28,13 +28,13 @@ N=100 #number of particles
 r=20 #particle radius
 minR=1 #min particle radius
 maxR=40 #max particle radius
-BIAS=2
+BIAS=10
 
 rScale=1.0
 rStep=.001
 
 t=0 #time
-maxt=2000000 #max time
+maxt=40000000 #max time
 stepSize=.1*r #random step size
 timeGapForPrintout=1000 #number of timesteps to skip before printing out coordinates
 
@@ -57,7 +57,7 @@ x=factor*2*r
 y=factor*2*r
 
 # open the file
-f=open('coords.txt','w')
+f=open('coords1.txt','w')
 
 for i in range(0,N):
     coords[i][0]=x;
