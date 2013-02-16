@@ -1,5 +1,7 @@
 from numpy import *
 import random
+import time
+
 #from __future__ import print_function
 
 def checkOverlap(i,j):
@@ -216,11 +218,14 @@ for i in range(0,N):
     theseNeighbors=arange(0,N,1)
     neighbors.append(theseNeighbors)
 
+timert=time.time()
+
 ############ run the simulation #########
 for t in range(0,maxt): #time loop
 
+    
 
-    print t
+    #print t
     #assign cells
     cellSize=assignCells()
     cellContents=assignCellContents()
@@ -290,6 +295,8 @@ for t in range(0,maxt): #time loop
 
     if t%timeGapForPrintout==0:
         printOut(f)
+        print time.time()-timert
+        timert=time.time()
         #for i in range(0,N):
         #    thisline=str(coords[i][0])+","+str(coords[i][1])+","+str(radii[i]*rScale)+"\n"
         #    f.write(thisline)

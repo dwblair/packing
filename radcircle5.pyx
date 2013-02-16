@@ -1,5 +1,7 @@
 from numpy import *
 import random
+import time
+
 #from __future__ import print_function
 
 def checkOverlap(i,j):
@@ -216,11 +218,14 @@ for i in range(0,N):
     theseNeighbors=arange(0,N,1)
     neighbors.append(theseNeighbors)
 
+timert=time.time()
+
 ############ run the simulation #########
 for t in range(0,maxt): #time loop
 
+    
 
-    print t
+    #print t
     #assign cells
     cellSize=assignCells()
     cellContents=assignCellContents()
@@ -244,15 +249,15 @@ for t in range(0,maxt): #time loop
     #print "moveType=",moveType
 
     if moveType != 1: # translation attempt
-	
-	i = random.randint(0,N-1)
-	xold=coords[i][0]
-	yold=coords[i][1]
+        
+        i = random.randint(0,N-1)
+        xold=coords[i][0]
+        yold=coords[i][1]
         xnew = xold + (2*random.random()-1)*stepSize;
         ynew = yold + (2*random.random()-1)*stepSize;
 
-	coords[i][0]=xnew
-	coords[i][1]=ynew
+        coords[i][0]=xnew
+        coords[i][1]=ynew
 
         # check for being outside box
         overlaps=overlaps+checkOutsideBox(xnew,ynew)
@@ -261,22 +266,19 @@ for t in range(0,maxt): #time loop
             coords[i][1]=yold
 
         # if not outside box, check for overlaps with neighbors
-	else: # check for overlaps in i's neighbors:
-	    for n in getNeighbors(i):
+        else: # check for overlaps in i's neighbors:
+            for n in getNeighbors(i):
                 if (i!=n):
                     overlaps=overlaps+checkOverlap(i,n)
                 if (overlaps>0):
                     coords[i][0]=xold
                     coords[i][1]=yold
                     break  
-		
-
     if moveType == 1: # grow / shrink attempt
         rScaleOld=rScale
         #BIASED -- used "BIAS*2" instead of "2":
-	rScale = rScale + (2*BIAS*random.random()-1)*rStep
-	#print "rScale=",rScale
-	if (rScale > rScaleOld):
+        rScale = rScale + (2*BIAS*random.random()-1)*rStep
+        if (rScale > rScaleOld):
             for i in range(0,N):
                 if overlaps>0:
                     rScale=rScaleOld
@@ -290,12 +292,13 @@ for t in range(0,maxt): #time loop
 
     if t%timeGapForPrintout==0:
         printOut(f)
+        print time.time()-timert
+        timert=time.time()
         #for i in range(0,N):
         #    thisline=str(coords[i][0])+","+str(coords[i][1])+","+str(radii[i]*rScale)+"\n"
         #    f.write(thisline)
             
         #thisline="@ "+str(t)+"\n"
-	#f.write(thisline)
 
 f.close()
 

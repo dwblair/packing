@@ -1,5 +1,7 @@
-from numpy import *
+import numpy as np
 import random
+import time
+
 #from __future__ import print_function
 
 def checkOverlap(i,j):
@@ -41,9 +43,9 @@ def assignCells():
     cellSize=2**power
     #print cellSize
     cellRows=L/cellSize
-    cellContents=[]
+    cellContents=np.array([])
     for i in range(0,N):
-        cellContents.append([])
+        cellContents=np.append(cellContents,[])
 
     for i in range(0,N):
         x=coords[i][0]
@@ -91,7 +93,7 @@ def assignCellContents():
 
 
 def getNeighbors(i):
-    neighbors=[]
+    neighbors=np.array([])
     cellNum=int(cells[i])
     cellRows=int(L/cellSize)
     cellColumn=remainder(cellNum,cellRows)
@@ -171,29 +173,29 @@ sigma=1.
 mu=0.
 
 #coordinates array
-coords=zeros((N,2))+L/2. #start all particles in the center
+coords=np.zeros((N,2))+L/2. #start all particles in the center
 
 #radii array
-radii=zeros(N)+r
+radii=np.zeros(N)+r
 
 #neighbors array
-neighbors=[]
+neighbors=np.array([])
 
 #cells array
-cells=zeros(N)
-cellContents=[]
+cells=np.zeros(N)
+cellContents=np.array([])
 for i in range(0,N):
-    cellContents.append([])
+    cellContents=np.append(cellContents,[])
 #thisCell=cellContents[10]
 #cellContents[3]=thisCell.append([4,2])
 #print cellContents
 
 
-cellNeighbors=[]
+cellNeighbors=np.array([])
 
 
 #colors array
-colors=zeros(N)
+colors=np.zeros(N)
 
 ####### initially put coordinates in a grid #######
 factor = 1.2 
@@ -216,11 +218,14 @@ for i in range(0,N):
     theseNeighbors=arange(0,N,1)
     neighbors.append(theseNeighbors)
 
+timert=time.time()
+
 ############ run the simulation #########
 for t in range(0,maxt): #time loop
 
+    
 
-    print t
+    #print t
     #assign cells
     cellSize=assignCells()
     cellContents=assignCellContents()
@@ -290,6 +295,8 @@ for t in range(0,maxt): #time loop
 
     if t%timeGapForPrintout==0:
         printOut(f)
+        print time.time()-timert
+        timert=time.time()
         #for i in range(0,N):
         #    thisline=str(coords[i][0])+","+str(coords[i][1])+","+str(radii[i]*rScale)+"\n"
         #    f.write(thisline)
