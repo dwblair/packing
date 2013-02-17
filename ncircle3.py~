@@ -2,27 +2,7 @@ import numpy as np
 import random
 import time
 
-timeGapForPrintout=1000
 
-L=2**9 #system size, compatible with size of display in processing -- and must be a power of 2 for assignCell to work
-N=100 #number of particles
-r=20. #particle radius
-
-t=0
-maxt=1000000
-
-coords=np.zeros((N,2))+L/2.
-colors=np.zeros(N)
-cellNums=np.zeros(N)
-maxNumberParticlesPerCell=10  # assumes no more than 10 particles per cell! may need to modify if polydisperse ...
-radii=np.zeros(N)+r
-stepSize=r*.1
-rScale=1.
-cellSize=10
-
-# params for moving algorithm
-mu = 0.
-translationStep=1.
 
 def checkIntersections(i):
     neighborIndices=np.concatenate((np.arange(0,i,1),np.arange(i+1,N,1)),axis=0)
@@ -51,7 +31,7 @@ def getCellSize():
     cellSize=2**power
     return cellSize
 
-def assignCells(): #assign a cell number to each particle
+def assignCells():
     #maxDiam=2*radii.max()*rScale
     #power=np.ceil(np.log2(maxDiam))
     #cellSize=2**power
@@ -64,35 +44,14 @@ def assignCells(): #assign a cell number to each particle
     cellNums=yCells*cellRows+xCells
     #print cellNums
     #print "cellSize=",cellSize
-    #cellContents=np.zeros((numCells,maxNumberParticlesPerCell))-1.
     return cellNums
-
-def assignCellContents(): #put all particles with same cell number in cells
-    cellSize=getCellSize() # double the work simply because I don't know how to do global variables!!
-    cellRows=L/cellSize
-    numCells=cellRows**2
     
-    cellNums=assignCells()
-    cellContents=np.zeros((numCells,maxNumberParticlesPerCell))-1. #-1 indicates not a real particle
-    #cell
-    # how to redo this for loop?
-    # for c in range (0,numCells):
-    #    thisCell cellNums==c
-    #print cellContents
-    
-    #print cellNums
-    
-    
-
-
 def printOut():
 
     #test of assignCells
     cellNums=assignCells()
-    #assignCells()
     cellSize=getCellSize()
     #print cellNums
-    assignCellContents()
     f=open('coords.txt','a')
 
     for i in range(0,N):
@@ -103,6 +62,23 @@ def printOut():
     f.write(thisline)
     f.close()
 
+
+timeGapForPrintout=1000
+
+L=2**9 #system size, compatible with size of display in processing -- and must be a power of 2 for assignCell to work
+N=100 #number of particles
+r=20. #particle radius
+
+t=0
+maxt=1000000
+
+coords=np.zeros((N,2))+L/2.
+colors=np.zeros(N)
+cellNums=np.zeros(N)
+radii=np.zeros(N)+r
+stepSize=r*.1
+rScale=1.
+cellSize=10
 
 # put coordinates in a grid
 factor=1.5
@@ -120,7 +96,9 @@ for i in range(0,N):
 
 timer_t=time.time()
 
-
+# params for moving algorithm
+mu = 0.
+translationStep=1.
 
 for t in range(0, maxt):
 
@@ -138,5 +116,5 @@ for t in range(0, maxt):
     
     if t%timeGapForPrintout==0:
         printOut()
-        print "%.7g" % float((time.time()-timer_t)/timeGapForPrintout)
+        print time.time()-timer_t
         timer_t=time.time()
