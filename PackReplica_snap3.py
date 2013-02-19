@@ -117,7 +117,7 @@ class PackReplica:
                 self.attemptTranslate(i)
             #expansion attempts
             self.attemptExpansion()
-            self.t=self.t+1
+        self.t=self.t+1
         
     def checkIntersections(self,i):
         neighborIndices=np.concatenate((np.arange(0,i,1),np.arange(i+1,self.N,1)),axis=0)
@@ -192,14 +192,13 @@ class PackReplica:
         f.close()
 
         
-simNum=500
-pressure=.1
+simNum=4
+pressure=.5
 randomSeed=10
 initialDensity=.1
 timeGapForPrintout=10
 N=10
 L=2**9
-tmax=200000
 
 while (pressure<10000):
     
@@ -207,12 +206,10 @@ while (pressure<10000):
     
     pr.initialize()
 
-    #for s in range(0,10000):
-    while (pr.t<tmax):
-        
+    for s in range(0,10000):
         pr.sweep(numSweeps=100)
     #print s, pr.r,pr.V/pr.L**2, pr.getDensity()
-        print pr.t, pr.pressure, pr.r, pr.getDensity()
+        print s, pr.pressure, pr.r, pr.getDensity()
         pr.printOut()
 
     pressure=pressure+.2

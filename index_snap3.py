@@ -27,11 +27,7 @@ float x;
 float y;
 float r;
 
-String coords0[];
-String coords1[];
-String coords2[];
-String coords3[];
-
+String coords[];
 String params[];
 int numLines;
 
@@ -63,13 +59,10 @@ size(inL,inL);
 
 text("loading ...",width/2,height/2);
 
-coords0=loadStrings("./coords.txt");
-coords1=loadStrings("./coords1.txt");
-coords2=loadStrings("./coords2.txt");
-coords3=loadStrings("./coords3.txt");
+coords=loadStrings("./coords.txt");
 
 //String coords[]=loadStrings("./coords.txt");
-numLines = coords0.length;
+numLines = coords.length;
 
 /*
 String thisLine=coords[1]; // the first line of the file will have the number of particles
@@ -104,7 +97,7 @@ int counter=0;
     //int j = (N+1)*t+i+1;
     //int j=i+1;
     //text(3,width/2,height/2);
-    String thisLine = coords0[i]; //inital +1 is because of '@' character; next one is because of "N" line at beginning of file
+    String thisLine = coords[i]; //inital +1 is because of '@' character; next one is because of "N" line at beginning of file
     float[] p = float(split(thisLine, ','));
     x=p[0];
     y=p[1];
@@ -121,7 +114,7 @@ int counter=0;
     counter=counter+1;
     i=i+1;
  }
-String thisLine=coords0[i];
+String thisLine=coords[i];
 float[] p = float(split(thisLine, ' '));
 int time=p[1];
 int cellSize=p[2];
