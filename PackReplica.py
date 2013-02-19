@@ -192,16 +192,18 @@ class PackReplica:
         f.close()
 
         
-simNum=500
-pressure=.1
-randomSeed=10
+simNum=0
+#pressure=.1
+pressureList=[10.,3.,2.,1.,.5,.1,0.1,.01,.001]
+randomSeed=0
 initialDensity=.1
 timeGapForPrintout=10
 N=10
 L=2**9
 tmax=200000
 
-while (pressure<10000):
+#while (pressure<10000):
+for pressure in pressureList:
     
     pr = PackReplica(L=L,N=N,timeGapForPrintout=timeGapForPrintout,outFileNum=simNum,pressure=pressure,randomSeed=randomSeed,initialDensity=initialDensity)
     
@@ -212,9 +214,9 @@ while (pressure<10000):
         
         pr.sweep(numSweeps=100)
     #print s, pr.r,pr.V/pr.L**2, pr.getDensity()
-        print pr.t, pr.pressure, pr.r, pr.getDensity()
+        #print pr.t, pr.pressure, pr.r, pr.getDensity()
         pr.printOut()
 
-    pressure=pressure+.2
+    #pressure=pressure+.2
     randomSeed=randomSeed+1
     simNum=simNum+1

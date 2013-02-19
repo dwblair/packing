@@ -36,11 +36,11 @@ int numLines;
 //String coords[]=loadStrings("./coords.txt");
 //int numLines = coords.length;
 
-float scaling=.3;
+
 
 void setup() {
   
-frameRate(15);
+ // frameRate(10);
 //background(0);
 //fill(0,255,0);
 paramsF=loadStrings("./params.in");
@@ -52,7 +52,7 @@ inL=float(params[1]);
 inR=float(params[2]);
 circleRadius=inR;
 
-size(inL*scaling,inL*scaling+70);
+size(inL,inL);
   //int counter=0;
   myFont=createFont("FFScala",10);
   textFont(myFont);
@@ -108,17 +108,15 @@ int counter=0;
 
     fill(255);
     stroke(0);
-    ellipse(x*scaling,y*scaling,2*r*scaling,2*r*scaling);
+    ellipse(x,y,2*r,2*r);
     fill(0,200,0);
-    text(counter,x*scaling-5,y*scaling+5);
+    text(cellNum,x-5,y+5);
     counter=counter+1;
     i=i+1;
  }
 String thisLine=coords[i];
 float[] p = float(split(thisLine, ' '));
 int time=p[1];
-		    float pressure=p[3];
-		    float density=p[4];
 int cellSize=p[2];
 stroke(255,0,0);
 int cellRow = 0;
@@ -132,16 +130,9 @@ cellRow++;
 //line(cellSize*cellColumn,0,cellSize*cellColumn,height);
 cellColumn++;
 }
-				 stroke(0,0,0);
-				 line(0.,inL*scaling,inL*scaling,inL*scaling);
+	   
 fill(255,0,0);
-				 text("density =",width-80,height-30);
-				 text(density,width-35,height-30);
-				 text("pressure =",width-80,height-50);
-				 text(pressure,width-30,height-50);
-				 
-text("sweep =",width-80,height-10);
-text(time,width-40,height-10);
+text(t,width-50,height-10);
 i=i+1; // for the '@' character
 //text(t,width/2,height/2);
 t=t+1; //update 
