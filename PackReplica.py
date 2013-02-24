@@ -1,12 +1,13 @@
 import numpy as np
 import random
 import time
+import os
+import sys
 
 
 class PackReplica:
     def __init__(self,L,N,outFileNum,pressure,randomSeed,initialDensity):
 
-        
         self.pressure=pressure
         self.randomSeed=randomSeed
         self.L=L
@@ -272,8 +273,9 @@ class PackReplica:
     def printOut(self):
 
         #the coords file
-        coordsOutFileName="coords"+str("%03d" % self.outFileNum)+".txt"
-        densityOutFileName="density"+str("%03d" % self.outFileNum)+".txt"
+        coordsOutFileName="N_"+str(self.N)+"_coords_"+str("%03d" % self.outFileNum)+".txt"
+        densityOutFileName="N_"+str(self.N)+"_stats_"+str("%03d" % self.outFileNum)+".txt"
+        #densityOutFileName="density"+str("%03d" % self.outFileNum)+".txt"
         
         f=open(coordsOutFileName,'a')
 
@@ -291,25 +293,36 @@ class PackReplica:
         f.write(thisline)
         f.close()
 
-        
+
+#res = os.system(sys.argv[1], sys.argv[2])
+#print sys.argv[1]
+
+#N=sys.argv[1]
+
+# run as "python PackReplica.py numSweeps tmax numSims N"
+numSweeps=int(sys.argv[1])
+tmax=int(sys.argv[2])
+numSims=int(sys.argv[3])
+N=int(sys.argv[4])
+
 #simNum=1
 #pressure=.1
 #pressureList=[10.,3.,2.,1.,.5,.1,0.1,.01,.001]
 #NList=[5,6,7,8,10,11]
 simNum=0
-simNumMax=100
-pressureList=[.01,.1, .2, .4, .8, 1., 5.,10.,12. ]
+#numSims=100
+pressureList=[.01,.02, .04, .08, .2, .4, .8, 2.,4.,8.,16.]
 randomSeed=0
-initialDensity=.1
-N=11
+initialDensity=.05
+#N=11
 L=2**9
-tmax=2000
-numSweeps=100
+#tmax=2000
+#numSweeps=100
 #while (pressure<10000):
 #pr.initialize()
 
 #for N in NList:
-while simNum<simNumMax:
+while simNum<numSims:
     
     pressure=pressureList[0]
     pr = PackReplica(L=L,N=N,outFileNum=simNum,pressure=pressure,randomSeed=randomSeed,initialDensity=initialDensity)
