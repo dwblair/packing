@@ -4,7 +4,7 @@ import time
 
 
 class PackReplica:
-    def __init__(self,L,N,outFileNum,pressure,randomSeed,initialDensity):
+    def __init__(self,L,N,timeGapForPrintout,outFileNum,pressure,randomSeed,initialDensity):
 
         
         self.pressure=pressure
@@ -287,7 +287,7 @@ class PackReplica:
 
         f=open(densityOutFileName,'a')
         
-        thisline=str(self.t)+" "+str(self.N)+" "+str(self.pressure)+" "+str(self.getDensity())+" "+str(self.densitySTD)+" "+str(self.getMSD())+" "+str(self.randomSeed)+" "+str(self.PIDfactor)+"\n"
+        thisline=str(self.t)+" "+str(self.N)+" "+str(self.pressure)+" "+str(self.getDensity())+" "+str(self.densitySTD)+" "+str(self.getMSD())+" "+str(self.randomSeed)+"\n"
         f.write(thisline)
         f.close()
 
@@ -295,24 +295,22 @@ class PackReplica:
 #simNum=1
 #pressure=.1
 #pressureList=[10.,3.,2.,1.,.5,.1,0.1,.01,.001]
-#NList=[5,6,7,8,10,11]
-simNum=0
-simNumMax=100
-pressureList=[.01,.1, .2, .4, .8, 1., 5.,10.,12. ]
+NList=[5,6,7,8,10,11]
+pressureList=[.1, .2, .4, .8, 1., 5.,10. ]
 randomSeed=0
 initialDensity=.1
-N=11
+timeGapForPrintout=10
+N=5
 L=2**9
-tmax=2000
-numSweeps=100
+tmax=200
+numSweeps=10
 #while (pressure<10000):
 #pr.initialize()
 
-#for N in NList:
-while simNum<simNumMax:
+for N in NList:
     
     pressure=pressureList[0]
-    pr = PackReplica(L=L,N=N,outFileNum=simNum,pressure=pressure,randomSeed=randomSeed,initialDensity=initialDensity)
+    pr = PackReplica(L=L,N=N,timeGapForPrintout=timeGapForPrintout,outFileNum=N,pressure=pressure,randomSeed=randomSeed,initialDensity=initialDensity)
     pr.initialize()
 
     for pressure in pressureList:
@@ -331,5 +329,5 @@ while simNum<simNumMax:
             thisT=thisT+numSweeps
 
         #pressure=pressure+.2
-    randomSeed=randomSeed+1
-    simNum=simNum+1
+        randomSeed=randomSeed+1
+        #simNum=simNum+1
