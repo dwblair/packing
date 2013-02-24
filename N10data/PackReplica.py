@@ -26,9 +26,6 @@ class PackReplica:
 
         # for MSD
         self.prevCoords=np.copy(self.coords)
-
-        # for assessing equilibrium
-        #self.prevDensity=self.density
         
         self.colors=np.zeros(N)
         self.cellNums=np.zeros(N)
@@ -40,11 +37,9 @@ class PackReplica:
 
 
         #variables for MSD calc
+        #self.MSD = np.zeros((N,2))
         self.prevCoords=np.zeros((N,2))
-
-        #variables for assessing equilibrium
-        self.equilibrated=False
-        self.densitySTD=1. 
+        
 
         # params for translation algorithm
         self.mu = 0.
@@ -57,7 +52,7 @@ class PackReplica:
         self.expanAcceptRatio=0.
         self.expanRatioCount=0.
         self.transRatioCount=0.
-        self.PIDfactor=0.05
+        self.PIDfactor=0.0
         self.idealAcceptRatio=.4
         
         random.seed(self.randomSeed)
@@ -81,12 +76,8 @@ class PackReplica:
         #print "attempt expand: r=",self.r
 
         
-        #dVScale=np.random.normal(self.mu,self.expansionStep)+1.
-        
-        dVScale=random.random()*self.expansionStep+1.
-        #(2*random.random()-1.)*self.expansionStep
+        dVScale=np.random.normal(self.mu,self.expansionStep)+1.
         dV=(dVScale-1.)*self.V
-        #dV=dVScale*self.V-self.V
 
         
         
@@ -118,9 +109,6 @@ class PackReplica:
             newDensity=self.N*3.14159/self.V #assumes particle radius 1
             #print "oldDensity=",oldDensity,"; newDensity=",newDensity
 
-            if newDensity*self.L**2/(self.N*3.14159) <0:
-                print "less than zero error!"
-
             self.r=np.sqrt(newDensity*self.L**2/(self.N*3.14159))
             #self.r=np.sqrt(self.L/self.V)
             #print "2=",np.sqrt(4.)
@@ -142,17 +130,13 @@ class PackReplica:
                 #self.acceptRatioMeasureLength=1000.
                 #self.acceptRatioCount=0
                 
-    
+        
     def getDensity(self):
         self.density=self.N*3.14159*self.r**2/self.L**2
         return self.density
     
     def sweep(self,numSweeps):
         #translation attempts
-
-        # assess density over range of numSweeps
-        prevDensities=np.zeros(numSweeps)
-        
         for s in range(0,numSweeps):
             for q in range(0,self.ratioTranslateExpansion): #makes sure we have a sweep of as many expansion attempts as we do the ratio between expansion attempts and translations
                 for p in range(0,self.ratioTranslateExpansion):
@@ -161,20 +145,12 @@ class PackReplica:
                 #expansion attempts
                 self.attemptExpansion()
             self.t=self.t+1 #however we define a sweep, we count t in 'sweeps'
-            prevDensities[s]=self.getDensity()
-            
-        # update the step sizes using the PID loop
+
+        # update the step sizes
         self.updatePID() #modify the translation and expansion steps to get closer to ideal acceptance ratio
 
-        # assess Equilibrium
-        #print prevDensities
-        self.densitySTD=np.std(prevDensities)
-        #print self.t, self.PIDFactor, densitySTD
-        
-        
-        
+
     def getMSD(self):
-        # calcuates MSD, normalized by R**2
         #coordDiff=np.zeros((N,2))
         coordDiff=self.coords-self.prevCoords
         diffX=coordDiff[:,0]
@@ -193,8 +169,8 @@ class PackReplica:
         self.transAcceptRatio=float(self.transAcceptRatio)/float(self.transRatioCount)
         self.expanAcceptRatio=float(self.expanAcceptRatio)/float(self.expanRatioCount)
 
-        
-        #print self.t, self.PIDfactor, self.pressure, self.getDensity(), self.transAcceptRatio,self.expanAcceptRatio, self.translationStep, self.expansionStep, self.getMSD()
+        #print "translateRatio=",self.transAcceptRatio, "; expandRatio=",self.expanAcceptRatio
+        print self.t, self.PIDfactor, self.pressure, self.getDensity(), self.transAcceptRatio,self.expanAcceptRatio, self.translationStep, self.expansionStep, self.getMSD()
 
         #update the step sizes
         transDiff=self.transAcceptRatio-self.idealAcceptRatio
@@ -287,49 +263,39 @@ class PackReplica:
 
         f=open(densityOutFileName,'a')
         
-        thisline=str(self.t)+" "+str(self.N)+" "+str(self.pressure)+" "+str(self.getDensity())+" "+str(self.densitySTD)+" "+str(self.getMSD())+"\n"
+        thisline=str(self.t)+" "+str(self.pressure)+" "+str(self.getDensity())+"\n"
         f.write(thisline)
         f.close()
 
         
-simNum=1
+simNum=0
 #pressure=.1
-#pressureList=[10.,3.,2.,1.,.5,.1,0.1,.01,.001]
-pressureList=[100,.1, .2, .4, .8, 1., 2., 4., 8., 12. ]
+pressureList=[10.,3.,2.,1.,.5,.1,0.1,.01,.001]
 randomSeed=0
 initialDensity=.1
 timeGapForPrintout=10
 N=10
 L=2**9
-tmax=2000
-numSweeps=1
+tmax=200000
+
 #while (pressure<10000):
-#pr.initialize()
-pressure=pressureList[0]
-
-pr = PackReplica(L=L,N=N,timeGapForPrintout=timeGapForPrintout,outFileNum=simNum,pressure=pressure,randomSeed=randomSeed,initialDensity=initialDensity)
-pr.initialize()
-
 for pressure in pressureList:
-
-    thisT=0
     
-    pr.pressure=pressure
+    pr = PackReplica(L=L,N=N,timeGapForPrintout=timeGapForPrintout,outFileNum=simNum,pressure=pressure,randomSeed=randomSeed,initialDensity=initialDensity)
+    
+    pr.initialize()
 
-    #for s in range(0,10000)
-    while (thisT<tmax):
+    #for s in range(0,10000):
+    while (pr.t<tmax):
         
-        pr.sweep(numSweeps=numSweeps)
+        pr.sweep(numSweeps=10)
     #print s, pr.r,pr.V/pr.L**2, pr.getDensity()
         #print pr.t, pr.pressure, pr.r, pr.getDensity()
         #pr.updatePID()
         #MSD=pr.getMSD()
-        #pr.assessEquilibrium()
-        print pr.t, pr.N, pr.pressure, pr.PIDfactor, pr.getDensity(), pr.densitySTD
+        
         pr.printOut()
 
-        thisT=thisT+numSweeps
-        
     #pressure=pressure+.2
     randomSeed=randomSeed+1
     simNum=simNum+1

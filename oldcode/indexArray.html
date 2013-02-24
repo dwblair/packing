@@ -28,6 +28,9 @@ float y;
 float r;
 
 String coords[];
+String coords0[];
+String coords1[];
+String coords2[];
 String params[];
 int numLines;
 
@@ -36,11 +39,11 @@ int numLines;
 //String coords[]=loadStrings("./coords.txt");
 //int numLines = coords.length;
 
-float scaling=.3;
+
 
 void setup() {
   
-frameRate(15);
+  frameRate(10);
 //background(0);
 //fill(0,255,0);
 paramsF=loadStrings("./params.in");
@@ -52,14 +55,14 @@ inL=float(params[1]);
 inR=float(params[2]);
 circleRadius=inR;
 
-size(inL*scaling,inL*scaling+70);
+size(1000,1000);
   //int counter=0;
   myFont=createFont("FFScala",10);
   textFont(myFont);
 
 text("loading ...",width/2,height/2);
 
-coords=loadStrings("./coords001.txt");
+coords=loadStrings("./coords.txt");
 
 //String coords[]=loadStrings("./coords.txt");
 numLines = coords.length;
@@ -90,9 +93,17 @@ void draw() {
 background(200);
 
 //i=0;
+int fileIndex=0;
 
 int counter=0;
   while (counter<N) {
+		    if (fileIndex==0) {
+		    displaceX=50.;
+		    displaceY=50.;
+		     
+		    }
+
+		    
     //text(i,width/2,height/2);
     //int j = (N+1)*t+i+1;
     //int j=i+1;
@@ -108,17 +119,18 @@ int counter=0;
 
     fill(255);
     stroke(0);
-    ellipse(x*scaling,y*scaling,2*r*scaling,2*r*scaling);
+    float displaceX=0.;
+    float displaceY=0.;
+		    float scaling=.3;
+    ellipse(scaling*x+displaceX,scaling*y+displaceY,2*r*scaling,2*r*scaling);
     fill(0,200,0);
-    text(counter,x*scaling-5,y*scaling+5);
+    //text(cellNum,x-5,y+5);
     counter=counter+1;
     i=i+1;
  }
 String thisLine=coords[i];
 float[] p = float(split(thisLine, ' '));
 int time=p[1];
-		    float pressure=p[3];
-		    float density=p[4];
 int cellSize=p[2];
 stroke(255,0,0);
 int cellRow = 0;
@@ -132,16 +144,23 @@ cellRow++;
 //line(cellSize*cellColumn,0,cellSize*cellColumn,height);
 cellColumn++;
 }
-				 stroke(0,0,0);
-				 line(0.,inL*scaling,inL*scaling,inL*scaling);
+				 float boxBeginX=0.+displaceX;
+				 float boxEndX=boxBeginX+inL*scaling;
+				 float boxBeginY=0.+displaceY;
+				 float boxEndY=boxBeginY+inL*scaling;
+				 line(boxBeginX,boxBeginY,boxEndX,boxBeginY); //top
+				 line(boxBeginX,boxBeginY,boxBeginX,boxEndY); // left side
+				 line(boxBeginX,boxEndY,boxEndX,boxEndY); // bottom
+				 line(boxEndX,boxBeginY,boxEndX,boxEndY); // right side
+				 fill(255,0,0); 
+				 text("time=",boxEndX-inL*scaling/2.-15,boxEndY+20);
+				 text(t,boxEndX-inL*scaling/2.+15,boxEndY+20);
 fill(255,0,0);
-				 text("density =",width-80,height-30);
-				 text(density,width-35,height-30);
-				 text("pressure =",width-80,height-50);
-				 text(pressure,width-30,height-50);
-				 
-text("sweep =",width-80,height-10);
-text(time,width-40,height-10);
+float pr = 3.;
+text("pressure=",width-150,height-10);
+text(pr,width-100,height-10);
+//text("density=",width-250,height-10);
+//text(
 i=i+1; // for the '@' character
 //text(t,width/2,height/2);
 t=t+1; //update 
@@ -150,8 +169,6 @@ if (i>=numLines) {
 i=0; //start at the beginning again
 t=0;
 }
-
-
 }
 
 
