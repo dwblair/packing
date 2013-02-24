@@ -49,7 +49,7 @@ class PackReplica:
         # params for translation algorithm
         self.mu = 0.
         self.translationStep=10.
-        self.expansionStep=.001
+        self.expansionStep=.01
         
         self.ratioTranslateExpansion=100
 
@@ -57,7 +57,7 @@ class PackReplica:
         self.expanAcceptRatio=0.
         self.expanRatioCount=0.
         self.transRatioCount=0.
-        self.PIDfactor=0.05
+        self.PIDfactor=0.1
         self.idealAcceptRatio=.4
         
         random.seed(self.randomSeed)
@@ -194,7 +194,7 @@ class PackReplica:
         self.expanAcceptRatio=float(self.expanAcceptRatio)/float(self.expanRatioCount)
 
         
-        #print self.t, self.PIDfactor, self.pressure, self.getDensity(), self.transAcceptRatio,self.expanAcceptRatio, self.translationStep, self.expansionStep, self.getMSD()
+        print self.t, self.PIDfactor, self.pressure, self.getDensity(), self.transAcceptRatio,self.expanAcceptRatio, self.translationStep, self.expansionStep, self.getMSD()
 
         #update the step sizes
         transDiff=self.transAcceptRatio-self.idealAcceptRatio
@@ -299,7 +299,7 @@ pressureList=[.1, .2, .4, .8, 1., 2., 4., 8., 12. ]
 randomSeed=0
 initialDensity=.1
 timeGapForPrintout=10
-N=10
+N=5
 L=2**9
 tmax=2000
 numSweeps=10
@@ -320,12 +320,7 @@ for pressure in pressureList:
     while (thisT<tmax):
         
         pr.sweep(numSweeps=numSweeps)
-    #print s, pr.r,pr.V/pr.L**2, pr.getDensity()
-        #print pr.t, pr.pressure, pr.r, pr.getDensity()
-        #pr.updatePID()
-        #MSD=pr.getMSD()
-        #pr.assessEquilibrium()
-        print pr.t, pr.N, pr.pressure, pr.PIDfactor, pr.getDensity(), pr.densitySTD
+        #print pr.t, pr.N, pr.pressure, pr.PIDfactor, pr.getDensity(), pr.densitySTD, pr.getMSD()
         pr.printOut()
 
         thisT=thisT+numSweeps
