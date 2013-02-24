@@ -287,44 +287,47 @@ class PackReplica:
 
         f=open(densityOutFileName,'a')
         
-        thisline=str(self.t)+" "+str(self.N)+" "+str(self.pressure)+" "+str(self.getDensity())+" "+str(self.densitySTD)+" "+str(self.getMSD())+"\n"
+        thisline=str(self.t)+" "+str(self.N)+" "+str(self.pressure)+" "+str(self.getDensity())+" "+str(self.densitySTD)+" "+str(self.getMSD())+" "+str(self.randomSeed)+"\n"
         f.write(thisline)
         f.close()
 
         
-simNum=1
+#simNum=1
 #pressure=.1
 #pressureList=[10.,3.,2.,1.,.5,.1,0.1,.01,.001]
-pressureList=[.1, .2, .4, .8, 1., 2., 4., 8., 12. ]
+NList=[5,6,7,8,10,11]
+pressureList=[.1, .2, .4, .8, 1., 5.,10. ]
 randomSeed=0
 initialDensity=.1
 timeGapForPrintout=10
 N=5
 L=2**9
-tmax=2000
+tmax=200
 numSweeps=10
 #while (pressure<10000):
 #pr.initialize()
-pressure=pressureList[0]
 
-pr = PackReplica(L=L,N=N,timeGapForPrintout=timeGapForPrintout,outFileNum=simNum,pressure=pressure,randomSeed=randomSeed,initialDensity=initialDensity)
-pr.initialize()
-
-for pressure in pressureList:
-
-    thisT=0
+for N in NList:
     
-    pr.pressure=pressure
+    pressure=pressureList[0]
+    pr = PackReplica(L=L,N=N,timeGapForPrintout=timeGapForPrintout,outFileNum=N,pressure=pressure,randomSeed=randomSeed,initialDensity=initialDensity)
+    pr.initialize()
 
-    #for s in range(0,10000)
-    while (thisT<tmax):
-        
-        pr.sweep(numSweeps=numSweeps)
-        #print pr.t, pr.N, pr.pressure, pr.PIDfactor, pr.getDensity(), pr.densitySTD, pr.getMSD()
-        pr.printOut()
+    for pressure in pressureList:
 
-        thisT=thisT+numSweeps
-        
-    #pressure=pressure+.2
-    randomSeed=randomSeed+1
-    simNum=simNum+1
+        thisT=0
+
+        pr.pressure=pressure
+
+        #for s in range(0,10000)
+        while (thisT<tmax):
+
+            pr.sweep(numSweeps=numSweeps)
+            #print pr.t, pr.N, pr.pressure, pr.PIDfactor, pr.getDensity(), pr.densitySTD, pr.getMSD()
+            pr.printOut()
+
+            thisT=thisT+numSweeps
+
+        #pressure=pressure+.2
+        randomSeed=randomSeed+1
+        #simNum=simNum+1
