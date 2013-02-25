@@ -49,8 +49,8 @@ class PackReplica:
 
         # params for translation algorithm
         self.mu = 0.
-        self.translationStep=10.
-        self.expansionStep=.01
+        self.translationStep=self.r*2
+        self.expansionStep=self.V*.1
         
         self.ratioTranslateExpansion=100
 
@@ -60,6 +60,8 @@ class PackReplica:
         self.transRatioCount=0.
         self.PIDfactor=0.1
         self.idealAcceptRatio=.4
+        self.ratioStats=np.zeros(2)
+        self.requiredSweepsToAchieveOptimalAcceptRatio=0
         
         random.seed(self.randomSeed)
 
@@ -84,15 +86,27 @@ class PackReplica:
         
         #dVScale=np.random.normal(self.mu,self.expansionStep)+1.
         
-        dVScale=(2*random.random()-1)*self.expansionStep+1.
-        #(2*random.random()-1.)*self.expansionStep
-        dV=(dVScale-1.)*self.V
-        #dV=dVScale*self.V-self.V
+        #dVScale=(2*random.random()-1)*self.expansionStep+1.
+        #dVScale=(2*random.random()-1)
+        
+        #print dVScale
+        #dV=(dVScale-1.)*self.V*self.expansionStep
+        
+        #make sure expansionStep isn't too big:
+        #while (self.V-self.expansionStep)<0:
+            # then expansStep is too large
+        #    print "#oops!", "self.V=",self.V, "self.expansionStep=",self.expansionStep
+        #   self.expansionStep=self.expansionStep*.9
+         #   
+        #dV=(2*random.random()-1)*self.expansionStep
 
+        
+        #while (self.V-dV)<0:
+        dV=np.random.normal(self.mu,self.expansionStep,1)[0]
         
         
         expansionFlag=False
-        if (dV < 0.):
+        if (dV < 0. and dV > -self.V): # is this second conditional biasing the system??
             expansionFlag=True
         if (dV > 0.):
             #print dV, (1-np.exp(self.pressure*dV))
@@ -121,6 +135,7 @@ class PackReplica:
 
             if newDensity*self.L**2/(self.N*3.14159) <0:
                 print "less than zero error!"
+                print "V=",self.V,"dV=",dV
 
             self.r=np.sqrt(newDensity*self.L**2/(self.N*3.14159))
             #self.r=np.sqrt(self.L/self.V)
@@ -195,7 +210,7 @@ class PackReplica:
         self.expanAcceptRatio=float(self.expanAcceptRatio)/float(self.expanRatioCount)
 
         
-        print self.t, self.PIDfactor, self.pressure, self.getDensity(), self.transAcceptRatio,self.expanAcceptRatio, self.translationStep, self.expansionStep, self.getMSD()
+        print self.t, self.PIDfactor, self.pressure, self.getDensity(), self.transAcceptRatio,self.expanAcceptRatio, self.translationStep, self.expansionStep, self.getMSD(), self.V
 
         #update the step sizes
         transDiff=self.transAcceptRatio-self.idealAcceptRatio
@@ -212,8 +227,12 @@ class PackReplica:
             self.expansionStep=self.expansionStep*(1.+self.PIDfactor)
         if  expanDiff<0: # accept ratio too low -->  step too big
             self.expansionStep=self.expansionStep*(1.-self.PIDfactor)
+        #if self.expansionStep>.5:
+        #    self.expansionStep=.5
             
         #reset values
+        self.ratioStats[0]=self.transAcceptRatio
+        self.ratioStats[1]=self.expanAcceptRatio
         self.transRatioCount=0
         self.expanRatioCount=0
         self.transAcceptRatio=0
@@ -289,7 +308,8 @@ class PackReplica:
 
         f=open(densityOutFileName,'a')
         
-        thisline=str(self.t)+" "+str(self.N)+" "+str(self.pressure)+" "+str(self.getDensity())+" "+str(self.densitySTD)+" "+str(self.getMSD())+" "+str(self.randomSeed)+" "+str(self.PIDfactor)+"\n"
+        thisline=str(self.t)+" "+str(self.N)+" "+str(self.pressure)+" "+str(self.getDensity())+" "+str(self.densitySTD)+" "+str(self.getMSD())+" "+str(self.randomSeed)+" "+str(self.PIDfactor)+" "+str(self.ratioStats[0])+" "+str(self.ratioStats[1])+" "+str(self.V)+" "+str(self.requiredSweepsToAchieveOptimalAcceptRatio)+"\n"
+
         f.write(thisline)
         f.close()
 
@@ -311,7 +331,11 @@ N=int(sys.argv[4])
 #NList=[5,6,7,8,10,11]
 simNum=0
 #numSims=100
-pressureList=[.01,.02, .04, .08, .2, .4, .8, 2.,4.,8.,16.]
+#pressureList=[.01, .1, .2, .4, .8, 2.,4.,8.,16.]
+invplist=np.linspace(40,.03,50)
+plist=1./invplist
+pressureList=plist[35:]
+
 randomSeed=0
 initialDensity=.05
 #N=11
@@ -328,21 +352,60 @@ while simNum<numSims:
     pr = PackReplica(L=L,N=N,outFileNum=simNum,pressure=pressure,randomSeed=randomSeed,initialDensity=initialDensity)
     pr.initialize()
 
+    
     for pressure in pressureList:
-
-        thisT=0
-
+        
         pr.pressure=pressure
 
-        #for s in range(0,10000)
+        #equilibrate at first
+        print "equilibrating ..."
+        acceptRatiosGood=False
+
+        # take a snapshot of the simulation before we let things evolve
+        tSnap=pr.t
+        pressureSnap=pr.pressure
+        rSnap=pr.r
+        VSnap=pr.V
+        coordsSnap=np.copy(pr.coords)
+        prevCoordsSnap=np.copy(pr.prevCoords)
+
+             
+
+        thisT=0
+        while(acceptRatiosGood==False):
+            pr.sweep(numSweeps=numSweeps)
+            #pr.printOut()
+
+            tr=pr.ratioStats[0] #translation accept ratio
+            ex=pr.ratioStats[1] #expansion accept ratio
+            print tr,ex
+            if (tr>.3 and tr<.5 and ex>.3 and ex<.5):
+                acceptRatiosGood=True
+                print "finished equilibrating in ", thisT, " steps"
+                pr.requiredSweepsToAchieveOptimalAcceptRatio=thisT
+                #thisT=tmax
+            thisT=thisT+numSweeps
+
+        #now begin actual simulation at this pressure value
+        print "beginning serious sim!"
+
+        #first retrieve original configurations
+        pr.t=tSnap
+        pr.pressure=pressureSnap
+        pr.r=rSnap
+        pr.V=VSnap
+        pr.coords=np.copy(coordsSnap)
+        pr.prevCoords=np.copy(prevCoordsSnap)
+
+        thisT=0
         while (thisT<tmax):
 
             pr.sweep(numSweeps=numSweeps)
-            #print pr.t, pr.N, pr.pressure, pr.PIDfactor, pr.getDensity(), pr.densitySTD, pr.getMSD()
             pr.printOut()
-
             thisT=thisT+numSweeps
+        
+        #print pr.t, pr.PIDfactor, pr.pressure, pr.getDensity(), pr.transAcceptRatio,pr.expanAcceptRatio, pr.translationStep, pr.expansionStep, pr.getMSD(), pr.V
 
-        #pressure=pressure+.2
+
     randomSeed=randomSeed+1
     simNum=simNum+1
