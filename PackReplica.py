@@ -27,6 +27,7 @@ class PackReplica:
 
         # for MSD
         self.prevCoords=np.copy(self.coords)
+        self.MSD=0.
 
         # for assessing equilibrium
         #self.prevDensity=self.density
@@ -63,6 +64,10 @@ class PackReplica:
         self.ratioStats=np.zeros(2)
         self.requiredSweepsToAchieveOptimalAcceptRatio=0
         
+        #density stats
+        self.highestDensity=0.
+
+        #random seed
         random.seed(self.randomSeed)
 
 
@@ -161,6 +166,8 @@ class PackReplica:
     
     def getDensity(self):
         self.density=self.N*3.14159*self.r**2/self.L**2
+        if self.density>self.highestDensity:
+            self.highestDensity=self.density
         return self.density
     
     def sweep(self,numSweeps):
@@ -178,7 +185,9 @@ class PackReplica:
                 self.attemptExpansion()
             self.t=self.t+1 #however we define a sweep, we count t in 'sweeps'
             prevDensities[s]=self.getDensity()
-            
+        
+        # update the MSD
+        self.MSD=self.getMSD()
         # update the step sizes using the PID loop
         self.updatePID() #modify the translation and expansion steps to get closer to ideal acceptance ratio
 
@@ -193,6 +202,7 @@ class PackReplica:
         # calcuates MSD, normalized by R**2
         #coordDiff=np.zeros((N,2))
         coordDiff=self.coords-self.prevCoords
+        #print "coordDiff=",coordDiff
         diffX=coordDiff[:,0]
         diffY=coordDiff[:,1]
         SD=diffX*diffX+diffY*diffY
@@ -308,7 +318,7 @@ class PackReplica:
 
         f=open(densityOutFileName,'a')
         
-        thisline=str(self.t)+" "+str(self.N)+" "+str(self.pressure)+" "+str(self.getDensity())+" "+str(self.densitySTD)+" "+str(self.getMSD())+" "+str(self.randomSeed)+" "+str(self.PIDfactor)+" "+str(self.ratioStats[0])+" "+str(self.ratioStats[1])+" "+str(self.V)+" "+str(self.requiredSweepsToAchieveOptimalAcceptRatio)+"\n"
+        thisline=str(self.t)+" "+str(self.N)+" "+str(self.pressure)+" "+str(self.getDensity())+" "+str(self.densitySTD)+" "+str(self.MSD)+" "+str(self.randomSeed)+" "+str(self.PIDfactor)+" "+str(self.ratioStats[0])+" "+str(self.ratioStats[1])+" "+str(self.V)+" "+str(self.requiredSweepsToAchieveOptimalAcceptRatio)+" "+str(self.highestDensity)+"\n"
 
         f.write(thisline)
         f.close()
@@ -378,7 +388,7 @@ while simNum<numSims:
 
             tr=pr.ratioStats[0] #translation accept ratio
             ex=pr.ratioStats[1] #expansion accept ratio
-            print tr,ex
+            print tr,ex, pr.MSD
             if (tr>.3 and tr<.5 and ex>.3 and ex<.5):
                 acceptRatiosGood=True
                 print "finished equilibrating in ", thisT, " steps"
@@ -397,15 +407,14 @@ while simNum<numSims:
         pr.coords=np.copy(coordsSnap)
         pr.prevCoords=np.copy(prevCoordsSnap)
 
+        #now carry out the sim
         thisT=0
         while (thisT<tmax):
-
             pr.sweep(numSweeps=numSweeps)
             pr.printOut()
             thisT=thisT+numSweeps
         
         #print pr.t, pr.PIDfactor, pr.pressure, pr.getDensity(), pr.transAcceptRatio,pr.expanAcceptRatio, pr.translationStep, pr.expansionStep, pr.getMSD(), pr.V
-
 
     randomSeed=randomSeed+1
     simNum=simNum+1
