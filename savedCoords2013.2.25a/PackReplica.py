@@ -66,8 +66,6 @@ class PackReplica:
         
         #density stats
         self.highestDensity=0.
-        self.highestDensityCoords=np.zeros((N,2))+L/2.
-        #self.bestDensityThreshold=.5
 
         #random seed
         random.seed(self.randomSeed)
@@ -164,19 +162,12 @@ class PackReplica:
                 self.expanAcceptRatio=self.expanAcceptRatio+1
                 #self.acceptRatioMeasureLength=1000.
                 #self.acceptRatioCount=0
-                if newDensity>self.highestDensity:
-                    self.highestDensity=newDensity
-                    self.highestDensityCoords=np.copy(self.coords)
-                    #self.printOut('best')
-                #self.highestDensity=newDensity
-                
-            
                 
     
     def getDensity(self):
         self.density=self.N*3.14159*self.r**2/self.L**2
-        #if self.density>self.highestDensity:
-        #    self.highestDensity=self.density
+        if self.density>self.highestDensity:
+            self.highestDensity=self.density
         return self.density
     
     def sweep(self,numSweeps):
@@ -307,27 +298,16 @@ class PackReplica:
                 y=y+factor*2*self.r
             #self.radii[i]=self.r
 
-
-    def printOut(self, printType):
+        
+    def printOut(self):
 
         #the coords file
-        if printType=='continuous':
-            coordsOutFileName="N_"+str(self.N)+"_coords_"+str("%03d" % self.outFileNum)+".txt"
-            densityOutFileName="N_"+str(self.N)+"_stats_"+str("%03d" % self.outFileNum)+".txt"
+        coordsOutFileName="N_"+str(self.N)+"_coords_"+str("%03d" % self.outFileNum)+".txt"
+        densityOutFileName="N_"+str(self.N)+"_stats_"+str("%03d" % self.outFileNum)+".txt"
         #densityOutFileName="density"+str("%03d" % self.outFileNum)+".txt"
+        
+        f=open(coordsOutFileName,'a')
 
-            f=open(coordsOutFileName,'a')
-            g=open(densityOutFileName,'a')
-
-        if printType=='highestDensity':
-            coordsOutFileName="N_"+str(self.N)+"_coords_best_"+str("%03d" % self.outFileNum)+".txt"
-            densityOutFileName="N_"+str(self.N)+"_stats_best_"+str("%03d" % self.outFileNum)+".txt"
-        #densityOutFileName="density"+str("%03d" % self.outFileNum)+".txt"
-
-            f=open(coordsOutFileName,'w')
-            g=open(densityOutFileName,'w')
-
-            
         for i in range(0,self.N):
             thisline=str(self.coords[i][0])+","+str(self.coords[i][1])+","+str(self.r)+","+str(self.cellNums[i])+"\n"
             f.write(thisline)
@@ -336,14 +316,12 @@ class PackReplica:
         f.write(thisline)
         f.close()
 
-        if printType=='continuous':
-            thisline=str(self.t)+" "+str(self.N)+" "+str(self.pressure)+" "+str(self.getDensity())+" "+str(self.densitySTD)+" "+str(self.MSD)+" "+str(self.randomSeed)+" "+str(self.PIDfactor)+" "+str(self.ratioStats[0])+" "+str(self.ratioStats[1])+" "+str(self.V)+" "+str(self.requiredSweepsToAchieveOptimalAcceptRatio)+" "+str(self.highestDensity)+"\n"
+        f=open(densityOutFileName,'a')
+        
+        thisline=str(self.t)+" "+str(self.N)+" "+str(self.pressure)+" "+str(self.getDensity())+" "+str(self.densitySTD)+" "+str(self.MSD)+" "+str(self.randomSeed)+" "+str(self.PIDfactor)+" "+str(self.ratioStats[0])+" "+str(self.ratioStats[1])+" "+str(self.V)+" "+str(self.requiredSweepsToAchieveOptimalAcceptRatio)+" "+str(self.highestDensity)+"\n"
 
-        if printType=='highestDensity':
-            thisline=str(self.highestDensity)+"\n"
-            
-        g.write(thisline)
-        g.close()
+        f.write(thisline)
+        f.close()
 
 
 #res = os.system(sys.argv[1], sys.argv[2])
@@ -400,7 +378,7 @@ while simNum<numSims:
         VSnap=pr.V
         coordsSnap=np.copy(pr.coords)
         prevCoordsSnap=np.copy(pr.prevCoords)
-        highestDensityCoordsSnap=np.copy(pr.highestDensityCoords)
+
              
 
         thisT=0
@@ -428,17 +406,14 @@ while simNum<numSims:
         pr.V=VSnap
         pr.coords=np.copy(coordsSnap)
         pr.prevCoords=np.copy(prevCoordsSnap)
-        pr.highestDensityCoords=np.copy(highestDensityCoordsSnap)
 
         #now carry out the sim
         thisT=0
         while (thisT<tmax):
             pr.sweep(numSweeps=numSweeps)
-            pr.printOut('continuous')
+            pr.printOut()
             thisT=thisT+numSweeps
-
-    #print out the best stats
-    pr.printOut('highestDensity')
+        
         #print pr.t, pr.PIDfactor, pr.pressure, pr.getDensity(), pr.transAcceptRatio,pr.expanAcceptRatio, pr.translationStep, pr.expansionStep, pr.getMSD(), pr.V
 
     randomSeed=randomSeed+1

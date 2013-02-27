@@ -56,7 +56,7 @@ size(inL*scaling,inL*scaling+70);
 text("loading ...",width/2,height/2);
 
 //coords=loadStrings("./coords003.txt");
-coords=loadStrings("./N_10_coords_best_000.txt");
+coords=loadStrings("./N_10_coords_000.txt");
 
 //String coords[]=loadStrings("./coords.txt");
 numLines = coords.length;

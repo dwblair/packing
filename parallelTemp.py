@@ -6,30 +6,36 @@ import sys
 
 import PackReplica
 
+
 numSweeps=int(sys.argv[1])
 tmax=int(sys.argv[2])
 numSims=int(sys.argv[3])
 N=int(sys.argv[4])
+numReplicas=int(sys.argv[5])
 
-#simNum=1
-#pressure=.1
-#pressureList=[10.,3.,2.,1.,.5,.1,0.1,.01,.001]
-#NList=[5,6,7,8,10,11]
 simNum=0
-#numSims=100
-#pressureList=[.01, .1, .2, .4, .8, 2.,4.,8.,16.]
-invplist=np.linspace(40,.03,50)
+invplist=np.linspace(40,.03,numReplicas)
 plist=1./invplist
 pressureList=plist[35:]
 
 randomSeed=0
 initialDensity=.05
-#N=11
 L=2**9
-#tmax=2000
-#numSweeps=100
-#while (pressure<10000):
-#pr.initialize()
+
+# build up replicas
+replicas=[]
+for r in range(0,numReplicas):
+    pressure=pressureList[0]
+    simNum=r
+    pr=PackReplica.PackReplica(L=L,N=N,outFileNum=simNum,pressure=pressure,randomSeed=randomSeed,initialDensity=initialDensity)
+    pr.initialize()
+    replicas.append(pr)
+
+for p in pressureList:
+
+    for r in range(0,numReplicas):
+        
+
 
 #for N in NList:
 while simNum<numSims:
