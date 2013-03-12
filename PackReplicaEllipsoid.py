@@ -116,9 +116,40 @@ class PackReplica:
         oldCoords=np.copy(self.coords[i])
 
         dr=np.random.normal(self.mu,self.translationStep,3) #array size 2 -- one random value for ea coord
-        self.coords[i][0]=(self.coords[i][0]+dr[0])%np.pi
-        self.coords[i][1]=(self.coords[i][1]+dr[1])%(2*np.pi)
+        #self.coords[i][0]=(self.coords[i][0]+dr[0])%np.pi
+        #self.coords[i][1]=(self.coords[i][1]+dr[1])%(2*np.pi)
 
+        theta=self.coords[i][0]+dr[0]
+        if theta>(np.pi/2.):
+            theta=theta%(np.pi/2.)
+        if theta<0.:
+            #print "YEAH"
+            #print "before= ",theta
+            theta=-1.*theta
+            theta=theta%(np.pi/2.)
+            theta=-1.*theta
+            #print "after=",theta
+        self.coords[i][0]=theta
+
+        phi=self.coords[i][1]+dr[1]
+        if phi>(np.pi):
+            phi=phi%(np.pi)
+        if phi<(0.):
+            phi=-1.*phi
+            phi=phi%(np.pi)
+            phi=-1.*phi
+        self.coords[i][1]=phi
+        
+        #self.coords[i][0]=(self.coords[i][0]+dr[0])%(np.pi/2.)
+        #self.coords[i][1]=(self.coords[i][1]+dr[1])%np.pi
+    
+        #theta=self.coords[i][0]
+        #phi=self.coords[i][1]
+
+        #theta=theta+dr[0]
+        #phi=phi+dr[1]
+
+        #if theta>(np.ip
 
         #if self.coords[i][0]
 
@@ -392,15 +423,16 @@ class PackReplica:
         
         # place particles in a grid
        
-        s=2*np.pi*self.R/(3*self.N); # arc length
+        #s=2*np.pi*self.R/(3*self.N); # arc length
 
-        theta=0
+        theta=-np.pi/2.
+        ds=np.pi/(4*self.N)
         phi=0
         for i in range(0,self.N):
             self.coords[i][0]=theta;
             self.coords[i][1]=phi;
             #self.coords[i][2]=z;
-            theta=theta+s
+            theta=theta+ds
 
 
     def printOut(self, printType):
