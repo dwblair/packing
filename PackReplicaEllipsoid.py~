@@ -124,11 +124,11 @@ class PackReplica:
             theta=theta%(np.pi/2.)
         if theta<0.:
             #print "YEAH"
-            print "before= ",theta
+            #print "before= ",theta
             theta=-1.*theta
             theta=theta%(np.pi/2.)
             theta=-1.*theta
-            print "after=",theta
+            #print "after=",theta
         self.coords[i][0]=theta
 
         phi=self.coords[i][1]+dr[1]
@@ -507,7 +507,7 @@ particleType="SPHERE"
 R=L/2.
 a=R
 b=R
-c=R*.25
+c=R*1.5
 
 #tmax=2000
 #numSweeps=100

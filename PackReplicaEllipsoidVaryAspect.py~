@@ -6,7 +6,7 @@ import sys
 
 
 class PackReplica:
-    def __init__(self,L,N,outFileNum,pressure,randomSeed,initialDensity, R,a,b,c,substrateType,particleType):
+    def __init__(self,L,N,outFileNum,pressure,randomSeed,initialDensity, R,a,b,c,substrateType,particleType,aspect):
 
         self.R=R
         self.pressure=pressure
@@ -17,6 +17,7 @@ class PackReplica:
         self.a=a
         self.b=b
         self.c=c
+        self.aspect=aspect
         self.substrateType=substrateType
         self.particleType=particleType
 
@@ -439,8 +440,8 @@ class PackReplica:
 
         #the coords file
         if printType=='continuous':
-            coordsOutFileName="N_"+str(self.N)+"_coords_"+str("%03d" % self.outFileNum)+".txt"
-            densityOutFileName="N_"+str(self.N)+"_stats_"+str("%03d" % self.outFileNum)+".txt"
+            coordsOutFileName="N_"+str(self.N)+"_aspect_"+str(self.aspect)+"_coords_"+str("%03d" % self.outFileNum)+".txt"
+            densityOutFileName="N_"+str(self.N)+"_aspect_"+str(self.aspect)+"_stats_"+str("%03d" % self.outFileNum)+".txt"
         #densityOutFileName="density"+str("%03d" % self.outFileNum)+".txt"
 
             f=open(coordsOutFileName,'a')
@@ -478,11 +479,14 @@ class PackReplica:
 
 #N=sys.argv[1]
 
-# run as "python PackReplica.py numSweeps tmax numSims N"
+# run as "python PackReplica.py numSweeps tmax numSims N cFactor" 
+# where cFactor controls the aspect ratio
+
 numSweeps=int(sys.argv[1])
 tmax=int(sys.argv[2])
 numSims=int(sys.argv[3])
 N=int(sys.argv[4])
+cFactor=float(sys.argv[5])
 
 #simNum=1
 #pressure=.1
@@ -496,7 +500,7 @@ plist=1./invplist
 pressureList=plist[35:]
 
 # REMOVE
-pressureList=[16.,32.]
+pressureList=[32.,64.]
 
 randomSeed=0
 initialDensity=.001
@@ -507,7 +511,8 @@ particleType="SPHERE"
 R=L/2.
 a=R
 b=R
-c=R*1.5
+c=R*cFactor
+aspect=cFactor
 
 #tmax=2000
 #numSweeps=100
@@ -518,7 +523,7 @@ c=R*1.5
 while simNum<numSims:
     
     pressure=pressureList[0]
-    pr = PackReplica(L=L,N=N,outFileNum=simNum,pressure=pressure,randomSeed=randomSeed,initialDensity=initialDensity, R=R,a=a,b=b,c=c, substrateType=substrateType,particleType=particleType)
+    pr = PackReplica(L=L,N=N,outFileNum=simNum,pressure=pressure,randomSeed=randomSeed,initialDensity=initialDensity, R=R,a=a,b=b,c=c, substrateType=substrateType,particleType=particleType,aspect=aspect)
     pr.initialize()
 
     
