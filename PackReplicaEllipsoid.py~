@@ -435,12 +435,12 @@ class PackReplica:
             theta=theta+ds
 
 
-    def printOut(self, printType):
+    def printOut(self, printType, outLabel):
 
         #the coords file
         if printType=='continuous':
-            coordsOutFileName="N_"+str(self.N)+"_coords_"+str("%03d" % self.outFileNum)+".txt"
-            densityOutFileName="N_"+str(self.N)+"_stats_"+str("%03d" % self.outFileNum)+".txt"
+            coordsOutFileName="N_"+str(self.N)+"_"+outLabel+"_coords_"+str("%03d" % self.outFileNum)+".txt"
+            densityOutFileName="N_"+str(self.N)+"_"+outLabel+"_stats_"+str("%03d" % self.outFileNum)+".txt"
         #densityOutFileName="density"+str("%03d" % self.outFileNum)+".txt"
 
             f=open(coordsOutFileName,'a')
@@ -483,6 +483,7 @@ numSweeps=int(sys.argv[1])
 tmax=int(sys.argv[2])
 numSims=int(sys.argv[3])
 N=int(sys.argv[4])
+outLabel=str(sys.argv[5])
 
 #simNum=1
 #pressure=.1
@@ -575,7 +576,7 @@ while simNum<numSims:
         thisT=0
         while (thisT<tmax):
             pr.sweep(numSweeps=numSweeps)
-            pr.printOut('continuous')
+            pr.printOut('continuous',outLabel)
             print pr.getDensity(), pr.r, pr.V
             thisT=thisT+numSweeps
 

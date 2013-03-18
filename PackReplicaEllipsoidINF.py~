@@ -497,7 +497,7 @@ plist=1./invplist
 pressureList=plist[35:]
 
 # REMOVE
-pressureList=[16.,32.]
+pressureList=[100.]
 
 randomSeed=0
 initialDensity=.001
@@ -508,7 +508,7 @@ particleType="SPHERE"
 R=L/2.
 a=R
 b=R
-c=R*1.5
+c=R*1.0
 
 #tmax=2000
 #numSweeps=100

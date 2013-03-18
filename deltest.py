@@ -6,13 +6,16 @@ points = np.random.rand(30, 2)
 tri = Delaunay(points)
 #or = Voronoi(points)
 p = tri.points[tri.vertices]
-n = tri.neighbors
+#print p
+n = tri.vertices
+
 for i in range(0,len(points)):
     ix=np.where(n==i) #indices of all triangles that contain the ith particle
     #print i, n[ix[0]] #print all the collections of triangles
     alltri=n[ix[0]]
     nn = np.setdiff1d(np.unique(np.concatenate(alltri)),np.array([i])) # all the neighboring indices
     print i, len(nn),nn
+
 #print n
 
 

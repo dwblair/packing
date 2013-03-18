@@ -6,7 +6,7 @@ import sys
 
 
 class PackReplica:
-    def __init__(self,L,N,outFileNum,pressure,randomSeed,initialDensity, R,a,b,c,substrateType,particleType):
+    def __init__(self,L,N,outFileNum,pressure,randomSeed,initialDensity, R,a,b,c,substrateType,particleType,aspect):
 
         self.R=R
         self.pressure=pressure
@@ -17,6 +17,7 @@ class PackReplica:
         self.a=a
         self.b=b
         self.c=c
+        self.aspect=aspect
         self.substrateType=substrateType
         self.particleType=particleType
 
@@ -435,12 +436,12 @@ class PackReplica:
             theta=theta+ds
 
 
-    def printOut(self, printType, outLabel):
+    def printOut(self, printType, extraString):
 
         #the coords file
         if printType=='continuous':
-            coordsOutFileName="N_"+str(self.N)+"_"+outLabel+"_coords_"+str("%03d" % self.outFileNum)+".txt"
-            densityOutFileName="N_"+str(self.N)+"_"+outLabel+"_stats_"+str("%03d" % self.outFileNum)+".txt"
+            coordsOutFileName="N_"+str(self.N)+"_aspect_"+str(self.aspect)+extraString+"_coords_"+str("%03d" % self.outFileNum)+".txt"
+            densityOutFileName="N_"+str(self.N)+"_aspect_"+str(self.aspect)+extraString+"_stats_"+str("%03d" % self.outFileNum)+".txt"
         #densityOutFileName="density"+str("%03d" % self.outFileNum)+".txt"
 
             f=open(coordsOutFileName,'a')
@@ -478,18 +479,21 @@ class PackReplica:
 
 #N=sys.argv[1]
 
-# run as "python PackReplica.py numSweeps tmax numSims N"
+# run as "python PackReplica.py numSweeps tmax numSims N cFactor simNumBase" 
+# where cFactor controls the aspect ratio
+
 numSweeps=int(sys.argv[1])
 tmax=int(sys.argv[2])
 numSims=int(sys.argv[3])
 N=int(sys.argv[4])
-outLabel=str(sys.argv[5])
+cFactor=float(sys.argv[5])
+simNumBase=int(sys.argv[6])
 
-#simNum=1
+simNum=simNumBase
 #pressure=.1
 #pressureList=[10.,3.,2.,1.,.5,.1,0.1,.01,.001]
 #NList=[5,6,7,8,10,11]
-simNum=0
+#simNum=0
 #numSims=100
 #pressureList=[.01, .1, .2, .4, .8, 2.,4.,8.,16.]
 invplist=np.linspace(40,.03,50)
@@ -497,7 +501,7 @@ plist=1./invplist
 pressureList=plist[35:]
 
 # REMOVE
-pressureList=[16.,32.]
+pressureList=[100.]
 
 randomSeed=0
 initialDensity=.001
@@ -508,7 +512,8 @@ particleType="SPHERE"
 R=L/2.
 a=R
 b=R
-c=R*1.5
+c=R*cFactor
+aspect=cFactor
 
 #tmax=2000
 #numSweeps=100
@@ -519,7 +524,7 @@ c=R*1.5
 while simNum<numSims:
     
     pressure=pressureList[0]
-    pr = PackReplica(L=L,N=N,outFileNum=simNum,pressure=pressure,randomSeed=randomSeed,initialDensity=initialDensity, R=R,a=a,b=b,c=c, substrateType=substrateType,particleType=particleType)
+    pr = PackReplica(L=L,N=N,outFileNum=simNum,pressure=pressure,randomSeed=randomSeed,initialDensity=initialDensity, R=R,a=a,b=b,c=c, substrateType=substrateType,particleType=particleType,aspect=aspect)
     pr.initialize()
 
     
@@ -576,7 +581,7 @@ while simNum<numSims:
         thisT=0
         while (thisT<tmax):
             pr.sweep(numSweeps=numSweeps)
-            pr.printOut('continuous',outLabel)
+            pr.printOut('continuous','_inflation_')
             print pr.getDensity(), pr.r, pr.V
             thisT=thisT+numSweeps
 

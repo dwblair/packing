@@ -229,8 +229,8 @@ class PackReplica:
         self.expanAcceptRatio=float(self.expanAcceptRatio)/float(self.expanRatioCount)
 
         
-        print self.t, self.PIDfactor, self.pressure, self.getDensity(), self.transAcceptRatio,self.expanAcceptRatio, self.translationStep, self.expansionStep, self.getMSD(), self.V
-
+        #print self.t, self.PIDfactor, self.pressure, self.getDensity(), self.transAcceptRatio,self.expanAcceptRatio, self.translationStep, self.expansionStep, self.getMSD(), self.V
+        
         #update the step sizes
         transDiff=self.transAcceptRatio-self.idealAcceptRatio
         expanDiff=self.expanAcceptRatio-self.idealAcceptRatio
@@ -368,6 +368,8 @@ invplist=np.linspace(40,.03,50)
 plist=1./invplist
 pressureList=plist[35:]
 
+print pressureList
+
 randomSeed=0
 initialDensity=.05
 #N=11
@@ -435,6 +437,7 @@ while simNum<numSims:
         while (thisT<tmax):
             pr.sweep(numSweeps=numSweeps)
             pr.printOut('continuous')
+            print pr.pressure, pr.getDensity()
             thisT=thisT+numSweeps
 
     #print out the best stats

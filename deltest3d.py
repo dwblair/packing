@@ -13,7 +13,10 @@ for i in range(0,len(points)):
     alltri=n[ix[0]]
     nn = np.setdiff1d(np.unique(np.concatenate(alltri)),np.array([i])) # all the neighboring indices
     nn = np.setdiff1d(nn,np.array([-1]))
-    print i, len(nn),nn
+    #print i, len(nn),nn
+    #print "i=",i
+    #for ne in nn:
+    #    print ne
 #print n
 
 

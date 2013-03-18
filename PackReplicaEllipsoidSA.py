@@ -492,12 +492,12 @@ outLabel=str(sys.argv[5])
 simNum=0
 #numSims=100
 #pressureList=[.01, .1, .2, .4, .8, 2.,4.,8.,16.]
-invplist=np.linspace(40,.03,50)
+invplist=np.linspace(40,.01,50)
 plist=1./invplist
 pressureList=plist[35:]
 
 # REMOVE
-pressureList=[16.,32.]
+#pressureList=[100.]
 
 randomSeed=0
 initialDensity=.001
@@ -508,7 +508,7 @@ particleType="SPHERE"
 R=L/2.
 a=R
 b=R
-c=R*1.5
+c=R*1.0
 
 #tmax=2000
 #numSweeps=100
